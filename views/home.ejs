@@ -19,12 +19,21 @@
       <div class="col-md-8">
         <div class="card shadow-sm">
           <div class="card-body">
-            This is the body
+            <form action="/upload" method="post" enctype="multipart/form-data">
+              <input type="file" name="photo" id="photo" class="form-control" />
+          </div>
+          <div class="card-footer">
+            <button type="submit" class="btn btn-primary w-100">Submit</button>
+            </form>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <section class="px-3 py-3 text-center">
+    <button class="btn btn-primary w-100" onclick="location.href = '/invoice';">Invoice</button>
+  </section>
 
   <script src="vendor/jquery/dist/jquery.min.js"></script>
   <script src="vendor/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -42,9 +51,7 @@
           }
           case 'complete': {
             console.log('Complete');
-            setTimeout(() => {
-              Swal.close();
-            }, 3000);
+            Swal.close();
             break;
           }
         }
