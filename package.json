@@ -1,0 +1,21 @@
+{
+  "name": "pdfkit",
+  "version": "1.0.0",
+  "description": "My PDF Kit",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord-cloud-database": "^2.5.1",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-multipart-file-parser": "^0.1.2",
+    "pdfkit": "^0.13.0"
+  }
+}
