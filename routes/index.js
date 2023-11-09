@@ -7,6 +7,8 @@ router.use(fileParser);
 
 router.get('/', pageController.home);
 
+router.get('/pdflive', pageController.pdflive);
+
 router.post('/upload', uploadImageMiddleware, pageController.upload);
 
 router.get('/invoice', (req, res, next) => {

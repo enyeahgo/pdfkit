@@ -13,33 +13,70 @@ function buildPDF(dataCallback, endCallback) {
 
   doc.image(path.resolve(__dirname, 'logo.jpg'), 50, 50, {width: 80});
 
-  doc.font(poppinsBold).fontSize(20).text(`GIFT OF A TREE`, 140, 55);
+  doc.font(poppinsBold).fontSize(20).text("GIFT OF A TREE", 140, 55);
   doc.font(poppinsItalic).fontSize(18).text(`"Trees for a better tomorrow!"`, 140, 75);
   doc.fontSize(12);
-  doc.font('Courier').text(`This serves as your invoice/receipt of your purchase of items in the Gift of a Tree App.`, 140, 110);
+  doc.font('Courier').text("This serves as your invoice/receipt of your purchase of items in the Gift of a Tree App.", 140, 110);
 
   doc.moveTo(50, 140).lineTo(545.28, 140).stroke();
 
-  doc.font('Courier-Bold').text('Date: ', 400, 160);
-  doc.font('Courier').text('10 Nov 2023', 450, 160);
+  doc.font('Courier-Bold').text('Date: ', 420, 150);
+  doc.font('Courier').text('10 Nov 2023', 465, 150);
+  doc.font('Courier-Bold').text('Reference Number: ', 333, 170);
+  doc.font('Courier').text('BUHFAIEUJ5', 465, 170);
 
-  doc.font('Courier-Bold').text('Reference Number: ', 50).moveDown(2);
-  doc.font('Courier').text('DUHVIE2JFK');
+  doc.text('', 50, 190);
 
-  doc.font('Courier-Bold').text('Buyer\'s Details:').moveDown(1);
-  doc.font('Courier').text('Inigo Orosco', ).moveDown(1);
+  doc.font(poppinsRegular).text("BUYER\'S DETAILS:").moveDown(1);
+  doc.font('Courier').text("Inigo Orosco", {indent: 30}).moveDown(0.5);
+  doc.font('Courier').text("enyeahgo@gmail.com", {indent: 30}).moveDown(0.5);
+  doc.font('Courier').text("09159476988", {indent: 30}).moveDown(1);
 
-  // Buyer's name and address
-  // Buyer's Contact details
-  // Quantity of goods or services: The number of units of each good or service that was sold.
-  // Unit price: The price per unit of each good or service.
-  // Subtotal: The total amount of money owed before any taxes or discounts are applied.
-  // Total amount due
-  // A reference number
+  doc.font(poppinsRegular).text("PURCHASED ITEMS:").moveDown(1);
+
+  createTable(doc, [[1,2],[1,2]]);
 
   doc.end();
 }
 
-// https://github.com/foliojs/pdfkit/issues/29
+function createTable(doc, data, width = 500) {
+  const startY = doc.y,
+    startX = doc.x,
+    distanceY = 20,
+    distanceX = 10;
+
+  doc.fontSize(12);
+
+  let currentY = startY;
+
+  data.forEach(value => {
+    let currentX = startX,
+      size = value.length;
+
+    let blockSize = width / size;
+
+    let c = 0;
+    value.forEach(text => {
+      if(c == 0) {
+        //Write text
+        doc.text(text, currentX + distanceX, currentY, {align: 'left'});
+      } else {
+        //Write text
+        doc.text(text, currentX + distanceX, currentY, {align: 'right'});
+      }
+
+      //Create rectangles
+      doc
+        .lineJoin("miter")
+        .rect(currentX, currentY, blockSize, distanceY)
+        .stroke();
+
+      currentX += blockSize;
+      c++;
+    });
+
+    currentY += distanceY;
+  });
+}
 
 module.exports = { buildPDF };
