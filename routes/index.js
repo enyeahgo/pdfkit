@@ -2,7 +2,9 @@ const router = require('express').Router();
 const pageController = require('../controllers/pageController');
 const { uploadImageMiddleware, deleteImageMiddleware } = require('../middlewares/multerDiscord');
 const pdfService = require('../service/pdf-service');
+const createInvoice = require('../service/createInvoice');
 const fileParser = require('express-multipart-file-parser');
+const fs = require('fs-sync');
 router.use(fileParser);
 
 router.get('/', pageController.home);
@@ -12,14 +14,22 @@ router.get('/pdflive', pageController.pdflive);
 router.post('/upload', uploadImageMiddleware, pageController.upload);
 
 router.get('/invoice', (req, res, next) => {
-  const stream = res.writeHead(200, {
-    'Content-Type': 'application/pdf',
-    'Content-Disposition': `attachment;filename=invoice.pdf`,
-  });
-  pdfService.buildPDF(
-    (chunk) => stream.write(chunk),
-    () => stream.end()
-  );
+  let items = [
+    { name: 'Yakal', qty: 1, type: 'block', price: 100450, subtotal: 100450, area: 'Y1'},
+    { name: 'Molave', qty: 1, type: 'block', price: 88900, subtotal: 88900, area: 'Mo2'},
+    { name: 'Red Narra', qty: 2, type: 'seedling', price: 2510, subtotal: 5020, area: 'RN3'}
+  ];
+
+  let data = {
+    date: '10 Nov 2023',
+    refNr: 'NSADVJIOE3',
+    name: 'Inigo Orosco', email: 'enyeahgo@gmail.com', mobile: '09159476988',
+    items: items 
+  }
+  
+  let fileUrl = createInvoice(`invoices/Invoice-${data.refNr}.pdf`, data);
+
+  res.status(200).send(fileUrl);
 });
 
 module.exports = router;

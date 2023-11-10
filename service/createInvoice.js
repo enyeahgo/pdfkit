@@ -1,17 +1,21 @@
+require('dotenv').config();
+const DiscordDatabase = require("discord-cloud-database");
+var discordDatabase = new DiscordDatabase(process.env.TOKEN, process.env.CHANNELID);
 const PDFDocument = require('pdfkit');
+const fs = require('fs');
+const Buffer = require('buffer').Buffer;
 const path = require('path');
+const { setDefaultAutoSelectFamilyAttemptTimeout } = require('net');
 
 const poppinsBold = path.resolve(__dirname, '..', 'public/assets/fonts/Poppins/Poppins-Bold.ttf');
 const poppinsRegular = path.resolve(__dirname, '..', 'public/assets/fonts/Poppins/Poppins-Regular.ttf');
 const poppinsItalic = path.resolve(__dirname, '..', 'public/assets/fonts/Poppins/Poppins-Italic.ttf');
 
-function buildPDF(data, dataCallback, endCallback) {
+const createInvoice = async (filename, data) => {
+
   const doc = new PDFDocument({ bufferPages: true, size: 'A4', margin: 50 });
 
   const { date, refNr, name, email, mobile, items } = data;
-
-  doc.on('data', dataCallback);
-  doc.on('end', endCallback);
 
   doc.image(path.resolve(__dirname, 'logo.jpg'), 50, 50, {width: 80});
 
@@ -52,8 +56,32 @@ function buildPDF(data, dataCallback, endCallback) {
 
   doc.font('Courier').fontSize(10).text('This invoice is computer-generated and does not require a manual signature.').moveDown(2);
 
+  // Create a writable stream to the file system
+  const writeStream = fs.createWriteStream(filename);
+
+  // Pipe the PDF document stream to the file system stream
+  doc.pipe(writeStream);
+
+  // Close the PDF document stream
   doc.end();
-}
+  
+  writeStream.on('finish', async () => {
+    writeStream.close();
+    let fileUrl = uploadPdf(filename);
+    return fileUrl;
+  });
+
+};
+
+const uploadPdf = async (filename) => {
+  const fileBuffer = Buffer.from(fs.readFileSync(path.resolve(__dirname, '..', filename)));
+  const fileUrl = await discordDatabase.uploadFile(
+    fileBuffer,
+    filename,
+    { id: process.env.CHANNELID }
+  );
+  return fileUrl;
+};
 
 function createTable(doc, data, width = 500) {
   const startY = doc.y,
@@ -106,4 +134,4 @@ function moneyfy(x, withPesoSign) {
   }
 }
 
-module.exports = { buildPDF };
+module.exports = createInvoice;
