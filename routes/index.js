@@ -28,7 +28,7 @@ router.get('/invoice', async (req, res, next) => {
   
   let fileUrl = await createInvoice(`invoices/Invoice-${data.refNr}.pdf`, data);
 
-  console.log(fileUrl);
+  console.log(fileUrl + "XXX");
 
   res.status(200).json(fileUrl);
 });
