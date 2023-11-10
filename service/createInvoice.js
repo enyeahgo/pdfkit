@@ -69,7 +69,6 @@ const createInvoice = (filename, data) => {
     writeStream.on('finish', async () => {
       writeStream.close();
       fileUrl = await uploadPdf(filename);
-      console.log(fileUrl);
       await deleteFile(filename);
       resolve(fileUrl);
     });

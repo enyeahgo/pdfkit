@@ -21,14 +21,12 @@ router.get('/invoice', async (req, res, next) => {
 
   let data = {
     date: '10 Nov 2023',
-    refNr: 'ABCDE12345',
+    refNr: 'ABCDEFGHIJ',
     name: 'Inigo Orosco', email: 'enyeahgo@gmail.com', mobile: '09159476988',
     items: items 
   }
   
   let fileUrl = await createInvoice(`invoices/Invoice-${data.refNr}.pdf`, data);
-
-  console.log(fileUrl + "XXX");
 
   res.status(200).json(fileUrl);
 });
