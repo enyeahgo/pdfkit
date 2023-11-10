@@ -5,7 +5,7 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const Buffer = require('buffer').Buffer;
 const path = require('path');
-const { setDefaultAutoSelectFamilyAttemptTimeout } = require('net');
+var fileUrl;
 
 const poppinsBold = path.resolve(__dirname, '..', 'public/assets/fonts/Poppins/Poppins-Bold.ttf');
 const poppinsRegular = path.resolve(__dirname, '..', 'public/assets/fonts/Poppins/Poppins-Regular.ttf');
@@ -64,23 +64,40 @@ const createInvoice = async (filename, data) => {
 
   // Close the PDF document stream
   doc.end();
-  
+
   writeStream.on('finish', async () => {
     writeStream.close();
-    let fileUrl = uploadPdf(filename);
+    fileUrl = await uploadPdf(filename);
+    console.log(fileUrl);
+    await deleteFile(filename);
     return fileUrl;
   });
 
+
 };
 
-const uploadPdf = async (filename) => {
-  const fileBuffer = Buffer.from(fs.readFileSync(path.resolve(__dirname, '..', filename)));
-  const fileUrl = await discordDatabase.uploadFile(
-    fileBuffer,
-    filename,
-    { id: process.env.CHANNELID }
-  );
-  return fileUrl;
+const uploadPdf = (filename) => {
+  return new Promise(async resolve => {
+    const fileBuffer = Buffer.from(fs.readFileSync(path.resolve(__dirname, '..', filename)));
+    let fileUploadData = await discordDatabase.uploadFile(
+      fileBuffer,
+      filename,
+      { id: process.env.CHANNELID }
+    );
+    resolve(fileUploadData);
+  });
+};
+
+const deleteFile = (filepath) => {
+  return new Promise((resolve, reject) => {
+    fs.unlink(filepath, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(true);
+      }
+    });
+  });
 };
 
 function createTable(doc, data, width = 500) {
